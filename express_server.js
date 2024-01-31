@@ -1,9 +1,11 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = { // default database when server is started TODO: move database into its own file and use fs to update it
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -41,12 +43,18 @@ app.get("/hello", (req, res) => {
 });
 
 app.get('/urls', (req, res) => { // renders index page when requested
-  const templateVars = {urls: urlDatabase};
+  const templateVars = {
+    username: req.cookies['username'],
+    urls: urlDatabase
+  };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => { // renders page to create new id when requested
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies['username']
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => { // redirects to longURL when requested for short id, if it exists. otherwise shows 404 message
@@ -59,7 +67,11 @@ app.get("/u/:id", (req, res) => { // redirects to longURL when requested for sho
 });
 
 app.get("/urls/:id", (req, res) => { // handles get request to render page with generated id
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = {
+    username: req.cookies['username'],
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id]
+  };
   res.render("urls_show", templateVars);
 });
 // stretch TODO: check if URL already exists in database
