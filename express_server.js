@@ -40,16 +40,16 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get('/urls', (req, res) => {
+app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {urls: urlDatabase};
   res.render('urls_index', templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
+app.get("/urls/new", (req, res) => { // renders page to create new id when requested
   res.render("urls_new");
 });
 
-app.get("/u/:id", (req, res) => {
+app.get("/u/:id", (req, res) => { // redirects to longURL when requested for short id, if it exists. otherwise shows 404 message
   if (!urlDatabase[req.params.id]) {
     res.send("404: The requested page doesn't exist");
   } else {
@@ -58,18 +58,18 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
-app.get("/urls/:id", (req, res) => {
+app.get("/urls/:id", (req, res) => { // handles get request to render page with generated id
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
-
-app.post("/urls", (req, res) => { // stretch TODO: check if URL already exists in database
+// stretch TODO: check if URL already exists in database
+app.post("/urls", (req, res) => { // creates short id for given URL and redirects to new page to show result
   const shortURLid = generateRandomString();
   urlDatabase[shortURLid] = req.body.longURL;
   res.redirect(`/urls/${shortURLid}`);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.post("/urls/:id/delete", (req, res) => { // handles post request to delete id from database then reroutes to index
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 })
