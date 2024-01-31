@@ -63,7 +63,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls", (req, res) => {
+app.post("/urls", (req, res) => { // stretch TODO: check if URL already exists in database
   const shortURLid = generateRandomString();
   urlDatabase[shortURLid] = req.body.longURL;
   res.redirect(`/urls/${shortURLid}`);
