@@ -50,8 +50,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  if (!urlDatabase[req.params.id]) {
+    res.send("404: The requested page doesn't exist");
+  } else {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
