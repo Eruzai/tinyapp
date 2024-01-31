@@ -5,12 +5,12 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
-const urlDatabase = {
+const urlDatabase = { // default database when server is started
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-function generateRandomString() {
+function generateRandomString() { // used to generate short URL id
   let string = "";
   while (string.length < 6) {
     const randomNum = Math.floor(Math.random() * 62); // generates a random number between 0 and 61 (let 0-9 be numbers, 10-35 be upper case letters, 36-61 be lower case letters)
