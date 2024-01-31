@@ -84,22 +84,22 @@ app.post("/urls", (req, res) => { // creates short id for given URL and redirect
 app.post("/urls/:id/delete", (req, res) => { // handles post request to delete id from database then reroutes to index
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
-})
+});
 
 app.post("/urls/:id", (req, res) => { // updates database with new URL for given ID
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect('/urls');
-})
+});
 
 app.post("/login", (req, res) => { // stores cookie with user login name
   res.cookie("username", req.body.username);
   res.redirect('/urls');
-})
+});
 
 app.post("/logout", (req, res) => { // clears cookie storing username when logout
   res.clearCookie("username");
   res.redirect('/urls');
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
