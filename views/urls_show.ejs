@@ -23,7 +23,7 @@
       </div>
       <div class="card-footer text-muted"></div>
       <h3>To update this URL, type the new address below and click Submit.</h3>
-      <form class="form-inline" action="/urls/:id/update" method="POST">
+      <form class="form-inline" action="/urls/<%= id %>" method="POST">
         <div class="form-group mb-2">
           <label for="longURL">New URL:</label>
           <input
