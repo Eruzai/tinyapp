@@ -96,7 +96,7 @@ app.post("/login", (req, res) => { // stores cookie with user login name
   res.redirect('/urls');
 })
 
-app.post("/logout", (req, res) => {
+app.post("/logout", (req, res) => { // clears cookie storing username when logout
   res.clearCookie("username");
   res.redirect('/urls');
 })
