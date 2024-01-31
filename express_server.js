@@ -74,12 +74,12 @@ app.post("/urls/:id/delete", (req, res) => { // handles post request to delete i
   res.redirect('/urls');
 })
 
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id", (req, res) => { // updates database with new URL for given ID
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect('/urls');
 })
 
-app.post("/login", (req, res) => {
+app.post("/login", (req, res) => { // stores cookie with user login name
   res.cookie("username", req.body.username);
   res.redirect('/urls');
 })
