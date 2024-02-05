@@ -12,6 +12,19 @@ const urlDatabase = { // default database when server is started TODO: move data
   '9sm5xK': 'http://www.google.com'
 };
 
+const users = {
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur'
+  },
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk'
+  }
+};
+
 const generateRandomString = function() { // used to generate short URL id
   let string = "";
   while (string.length < 6) {
@@ -107,6 +120,10 @@ app.post('/logout', (req, res) => { // clears cookie storing username when logou
   res.clearCookie('username');
   res.redirect('/urls');
 });
+
+app.post('/register', (req, res) => { // adds new username with password to users object
+  
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
