@@ -12,18 +12,7 @@ const urlDatabase = { // default database when server is started TODO: move data
   '9sm5xK': 'http://www.google.com'
 };
 
-const users = {
-  userRandomID: {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
-  },
-  user2RandomID: {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'dishwasher-funk'
-  }
-};
+const users = {}; // default database to store usernames, passwords and emails
 
 const generateRandomString = function() { // used to generate short URL id
   let string = "";
@@ -121,8 +110,15 @@ app.post('/logout', (req, res) => { // clears cookie storing username when logou
   res.redirect('/urls');
 });
 
-app.post('/register', (req, res) => { // adds new username with password to users object
-  
+app.post('/register', (req, res) => { // adds new user ID with password and email to users object. also stores cookie for ID
+  const newUserID = generateRandomString();
+  users[newUserID] = {};
+  users[newUserID].id = newUserID;
+  users[newUserID].email = req.body.email;
+  users[newUserID].password = req.body.password;
+  res.cookie('user_id', newUserID);
+  console.log('new data added: ', users);
+  res.redirect('/urls');
 })
 
 app.listen(PORT, () => {
