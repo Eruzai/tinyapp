@@ -152,7 +152,7 @@ app.post('/login', (req, res) => { // stores cookie with user login id after val
 
 app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 app.post('/register', (req, res) => { // adds new user ID with password and email to users object. also stores cookie for ID
