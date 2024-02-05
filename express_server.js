@@ -18,7 +18,7 @@ const getUserByEmail = function(emailToFind) {
   for (const user in users) {
     const userEmail = users[user].email;
     if (userEmail === emailToFind) {
-      return true;
+      return user;
     }
   }
   return false;
@@ -30,6 +30,17 @@ const isValidRegistration = function(email, password) { // checks for empty pass
   }
   if (getUserByEmail(email)) {
     return "That email is being used by someone else, please choose another!";
+  }
+  return true;
+};
+
+const loginValidation = function(loginEmail, loginPassword) {
+  const getUserByEmailResult = getUserByEmail(loginEmail);
+  if (getUserByEmailResult === false) {
+    return "Can't find user with that email!";
+  }
+  if (users[getUserByEmailResult].password !== loginPassword) {
+    return "Incorrect password given!";
   }
   return true;
 };
@@ -127,9 +138,16 @@ app.post('/urls/:id', (req, res) => { // updates database with new URL for given
   res.redirect('/urls');
 });
 
-app.post('/login', (req, res) => { // stores cookie with user login name
-  res.cookie('user_id', req.body.user_id);
-  res.redirect('/urls');
+app.post('/login', (req, res) => { // stores cookie with user login id after validation check
+  const loginValidationResult = loginValidation(req.body.email, req.body.password);
+  if (loginValidationResult !== true) {
+    res.statusCode = 403;
+    res.send(loginValidationResult);
+  } else {
+    const userID = getUserByEmail(req.body.email);
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  }
 });
 
 app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
