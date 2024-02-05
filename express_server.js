@@ -83,25 +83,37 @@ app.get('/urls', (req, res) => { // renders index page when requested
   res.render('urls_index', templateVars);
 });
 
-app.get('/urls/new', (req, res) => { // renders page to create new id when requested
-  const templateVars = {
-    user: users[req.cookies['user_id']],
-  };
-  res.render('urls_new', templateVars);
+app.get('/urls/new', (req, res) => { // renders page to create new id. if not logged in, redirects to login page
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+  } else {
+    const templateVars = {
+      user: users[req.cookies['user_id']],
+    };
+    res.render('urls_new', templateVars);
+  }
 });
 
-app.get('/register', (req, res) => { // renders page to register for an account
-  const templateVars = {
-    user: users[req.cookies['user_id']],
-  };
-  res.render('register', templateVars);
+app.get('/register', (req, res) => { // renders page to register for an account. if logged in already, redirects to /urls
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user: users[req.cookies['user_id']],
+    };
+    res.render('register', templateVars);
+  }
 });
 
-app.get('/login', (req, res) => { // renders login page
-  const templateVars = {
-    user: users[req.cookies['user_id']],
-  };
-  res.render('login', templateVars);
+app.get('/login', (req, res) => { // renders login page. if logged in already, redirects to /urls
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user: users[req.cookies['user_id']],
+    };
+    res.render('login', templateVars);
+  }
 });
 
 app.get('/u/:id', (req, res) => { // redirects to longURL when requested for short id, if it exists. otherwise shows 404 message
@@ -122,10 +134,14 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
   res.render('urls_show', templateVars);
 });
 // stretch TODO: check if URL already exists in database
-app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result
-  const shortURLid = generateRandomString();
-  urlDatabase[shortURLid] = req.body.longURL;
-  res.redirect(`/urls/${shortURLid}`);
+app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
+  if (!req.cookies['user_id']) {
+    res.send('You must be logged in to shorten URLs!');
+  } else {
+    const shortURLid = generateRandomString();
+    urlDatabase[shortURLid] = req.body.longURL;
+    res.redirect(`/urls/${shortURLid}`);
+  }
 });
 
 app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index
