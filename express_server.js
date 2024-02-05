@@ -84,7 +84,14 @@ app.get('/register', (req, res) => { // renders page to register for an account
     user: users[req.cookies['user_id']],
   };
   res.render('register', templateVars);
-})
+});
+
+app.get('/login', (req, res) => { // renders login page
+  const templateVars = {
+    user: users[req.cookies['user_id']],
+  };
+  res.render('login', templateVars);
+});
 
 app.get('/u/:id', (req, res) => { // redirects to longURL when requested for short id, if it exists. otherwise shows 404 message
   if (!urlDatabase[req.params.id]) {
@@ -131,10 +138,10 @@ app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
 });
 
 app.post('/register', (req, res) => { // adds new user ID with password and email to users object. also stores cookie for ID
-  const registration = isValidRegistration(req.body.email, req.body.password);
-  if (registration !== true) { // sends appropriate message to user if registration info invalid
+  const registrationValidationResult = isValidRegistration(req.body.email, req.body.password);
+  if (registrationValidationResult !== true) { // sends appropriate message to user if registration info invalid
     res.statusCode = 400;
-    res.send(registration);
+    res.send(registrationValidationResult);
   } else { // creates new user if registration info is valid
     const newUserID = generateRandomString();
     users[newUserID] = {};
