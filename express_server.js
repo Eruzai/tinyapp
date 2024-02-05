@@ -12,7 +12,7 @@ const urlDatabase = { // default database when server is started TODO: move data
   '9sm5xK': 'http://www.google.com'
 };
 
-const users = {}; // default database to store usernames, passwords and emails
+const users = {}; // default database to store user IDs, passwords and emails
 
 const generateRandomString = function() { // used to generate short URL id
   let string = "";
@@ -46,7 +46,7 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
-    username: req.cookies['username'],
+    user: users[req.cookies['user_id']],
     urls: urlDatabase
   };
   res.render('urls_index', templateVars);
@@ -54,14 +54,14 @@ app.get('/urls', (req, res) => { // renders index page when requested
 
 app.get('/urls/new', (req, res) => { // renders page to create new id when requested
   const templateVars = {
-    username: req.cookies['username']
+    user: users[req.cookies['user_id']],
   };
   res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => { // renders page to register for an account
   const templateVars = {
-    username: req.cookies['username']
+    user: users[req.cookies['user_id']],
   };
   res.render('register', templateVars);
 })
@@ -77,7 +77,7 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
 
 app.get('/urls/:id', (req, res) => { // handles get request to render page with generated id
   const templateVars = {
-    username: req.cookies['username'],
+    user: users[req.cookies['user_id']],
     id: req.params.id,
     longURL: urlDatabase[req.params.id]
   };
@@ -101,12 +101,12 @@ app.post('/urls/:id', (req, res) => { // updates database with new URL for given
 });
 
 app.post('/login', (req, res) => { // stores cookie with user login name
-  res.cookie('username', req.body.username);
+  res.cookie('user_id', req.body.user_id);
   res.redirect('/urls');
 });
 
-app.post('/logout', (req, res) => { // clears cookie storing username when logout
-  res.clearCookie('username');
+app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
