@@ -27,10 +27,10 @@ const getUserByEmail = function(emailToFind) {
 const isValidRegistration = function(email, password) { // checks for empty password or email fields and if a user already has the email
   if (email === '' || password === '') {
     return "Both of the email and password forms must not be empty!";
-  };
+  }
   if (getUserByEmail(email)) {
     return "That email is being used by someone else, please choose another!";
-  };
+  }
   return true;
 };
 
