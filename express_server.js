@@ -14,11 +14,21 @@ const urlDatabase = { // default database when server is started TODO: move data
 
 const users = {}; // default database to store user IDs, passwords and emails
 
-const isValidRegistration = function(email, password) {
+const getUserByEmail = function(emailToFind) {
+  for (const user in users) {
+    const userEmail = users[user].email;
+    if (userEmail === emailToFind) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const isValidRegistration = function(email, password) { // checks for empty password or email fields and if a user already has the email
   if (email === '' || password === '') {
     return "Both of the email and password forms must not be empty!";
   };
-  if (getUserByEmail()) {
+  if (getUserByEmail(email)) {
     return "That email is being used by someone else, please choose another!";
   };
   return true;
@@ -125,15 +135,16 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
   if (registration !== true) { // sends appropriate message to user if registration info invalid
     res.statusCode = 400;
     res.send(registration);
-  };
-  const newUserID = generateRandomString();
-  users[newUserID] = {};
-  users[newUserID].id = newUserID;
-  users[newUserID].email = req.body.email;
-  users[newUserID].password = req.body.password;
-  res.cookie('user_id', newUserID);
-  console.log('new data added: ', users);
-  res.redirect('/urls');
+  } else { // creates new user if registration info is valid
+    const newUserID = generateRandomString();
+    users[newUserID] = {};
+    users[newUserID].id = newUserID;
+    users[newUserID].email = req.body.email;
+    users[newUserID].password = req.body.password;
+    res.cookie('user_id', newUserID);
+    console.log('new data added: ', users);
+    res.redirect('/urls');
+  }
 });
 
 app.listen(PORT, () => {
