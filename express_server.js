@@ -14,6 +14,16 @@ const urlDatabase = { // default database when server is started TODO: move data
 
 const users = {}; // default database to store user IDs, passwords and emails
 
+const isValidRegistration = function(email, password) {
+  if (email === '' || password === '') {
+    return "Both of the email and password forms must not be empty!";
+  };
+  if (getUserByEmail()) {
+    return "That email is being used by someone else, please choose another!";
+  };
+  return true;
+};
+
 const generateRandomString = function() { // used to generate short URL id
   let string = "";
   while (string.length < 6) {
@@ -111,6 +121,11 @@ app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
 });
 
 app.post('/register', (req, res) => { // adds new user ID with password and email to users object. also stores cookie for ID
+  const registration = isValidRegistration(req.body.email, req.body.password);
+  if (registration !== true) { // sends appropriate message to user if registration info invalid
+    res.statusCode = 400;
+    res.send(registration);
+  };
   const newUserID = generateRandomString();
   users[newUserID] = {};
   users[newUserID].id = newUserID;
@@ -119,7 +134,7 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
   res.cookie('user_id', newUserID);
   console.log('new data added: ', users);
   res.redirect('/urls');
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
