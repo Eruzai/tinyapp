@@ -13,40 +13,50 @@
 
   <body>
     <%- include('partials/_header') %>
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
-        </p>
+    <% if(!userOwnsURLResult){ %>
+      <div style="margin: 1em;">
+        <p>This URL doesn't belong to you!</p>
       </div>
-      <div class="card-footer text-muted">
-        <h5 class="card-title">
-          Made a mistake? Type the new address below and click Submit.
-        </h5>
-        <form class="form-inline justify-content-center" action="/urls/<%= id %>" method="POST">
-          <div class="form-group mb-2">
-            <label for="longURL">New URL: </label>
-            <input
-            class="form-control"
-            type="text"
-            name="longURL"
-            placeholder="http://"
-            style="width: 300px; margin: 1em"
-            />
-            <button type="submit" class="btn btn-primary">Submit</button>
+      <% } else if(user){ %>
+        <div class="card text-center">
+          <div class="card-header"></div>
+          <div class="card-body">
+            <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+            <p class="card-text">
+              Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
+            </p>
           </div>
-        </form>
+          <div class="card-footer text-muted">
+            <h5 class="card-title">
+              Made a mistake? Type the new address below and click Submit.
+            </h5>
+            <form class="form-inline justify-content-center" action="/urls/<%= id %>" method="POST">
+              <div class="form-group mb-2">
+                <label for="longURL">New URL: </label>
+                <input
+                class="form-control"
+                type="text"
+                name="longURL"
+                placeholder="http://"
+                style="width: 300px; margin: 1em"
+                />
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-text">
+              Want to create a new URL? <a href="/urls/new">Click here!</a>
+            </h5>
+          </div>
+        </div>
+    <% } else{ %>
+      <div style="margin: 1em;">
+        <p>There's nothing to show here! Please <a href="/login">login</a> or <a href="/register">register</a> for a new account to show links.</p>
       </div>
-    </div>
-    <div class="card text-center">
-      <div class="card-body">
-        <h5 class="card-text">
-          Want to create a new URL? <a href="/urls/new">Click here!</a>
-        </h5>
-      </div>
-    </div>
+      <% } %>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
