@@ -126,7 +126,7 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
   if (!urlDatabase[req.params.id]) {
     res.send("404: The requested page doesn't exist");
   } else {
-    const longURL = urlDatabase[req.params.id];
+    const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
 });
@@ -135,7 +135,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
   const templateVars = {
     user: users[req.cookies['user_id']],
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id].longURL
   };
   res.render('urls_show', templateVars);
 });
@@ -145,7 +145,8 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     res.send('You must be logged in to shorten URLs!');
   } else {
     const shortURLid = generateRandomString();
-    urlDatabase[shortURLid] = req.body.longURL;
+    urlDatabase[shortURLid] = {};
+    urlDatabase[shortURLid].longURL = req.body.longURL;
     res.redirect(`/urls/${shortURLid}`);
   }
 });
@@ -155,8 +156,8 @@ app.post('/urls/:id/delete', (req, res) => { // handles post request to delete i
   res.redirect('/urls');
 });
 
-app.post('/urls/:id', (req, res) => { // updates database with new URL for given ID
-  urlDatabase[req.params.id] = req.body.longURL;
+app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path)
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls');
 });
 
