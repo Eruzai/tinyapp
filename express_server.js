@@ -1,5 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs'); // password hashing
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -64,7 +66,7 @@ const loginValidation = function(loginEmail, loginPassword) {
   if (getUserByEmailResult === false) {
     return "Can't find user with that email!";
   }
-  if (users[getUserByEmailResult].password !== loginPassword) {
+  if (!bcrypt.compareSync(loginPassword, users[getUserByEmailResult].password)) {
     return "Incorrect password given!";
   }
   return true;
@@ -225,7 +227,8 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
     users[newUserID] = {};
     users[newUserID].id = newUserID;
     users[newUserID].email = req.body.email;
-    users[newUserID].password = req.body.password;
+    users[newUserID].password = bcrypt.hashSync(req.body.password, 10);
+    console.log(users);
     res.cookie('user_id', newUserID);
     res.redirect('/urls');
   }
