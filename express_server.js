@@ -23,9 +23,9 @@ const urlDatabase = { // default database when server is started TODO: move data
 
 const users = {}; // default database to store user IDs, passwords and emails
 
-const getUserByEmail = function(emailToFind) { // find user in the database that matches the given email
-  for (const user in users) {
-    const userEmail = users[user].email;
+const getUserByEmail = function(emailToFind, database) { // find user in the database that matches the given email
+  for (const user in database) {
+    const userEmail = database[user].email;
     if (userEmail === emailToFind) {
       return user;
     }
@@ -33,11 +33,11 @@ const getUserByEmail = function(emailToFind) { // find user in the database that
   return false;
 };
 
-const urlsForUser = function(id) { // return the URLs in the database that a user has created
+const urlsForUser = function(id, database) { // return the URLs in the database that a user has created
   const urls = {};
-  for (const shortURL in urlDatabase) {
-    const userWhoCreatedURL = urlDatabase[shortURL].userID;
-    const longURLForShortURL = urlDatabase[shortURL].longURL;
+  for (const shortURL in database) {
+    const userWhoCreatedURL = database[shortURL].userID;
+    const longURLForShortURL = database[shortURL].longURL;
     if (userWhoCreatedURL === id) {
       urls[shortURL] = longURLForShortURL;
     }
@@ -45,8 +45,8 @@ const urlsForUser = function(id) { // return the URLs in the database that a use
   return urls;
 };
 
-const userOwnsShortURL = function(ID, URL) { // return true or false dependant on if the user owns the URL
-  if (urlDatabase[URL].userID === ID) {
+const userOwnsShortURL = function(ID, URL, database) { // return true or false dependant on if the user owns the URL
+  if (database[URL].userID === ID) {
     return true;
   }
   return false;
@@ -62,8 +62,8 @@ const isValidRegistration = function(email, password) { // checks for empty pass
   return true;
 };
 
-const loginValidation = function(loginEmail, loginPassword) { // checks if email exists, then checks stored password of that email to login password
-  const getUserByEmailResult = getUserByEmail(loginEmail);
+const loginValidation = function(loginEmail, loginPassword, database) { // checks if email exists within the database, then checks stored password of that email to login password
+  const getUserByEmailResult = getUserByEmail(loginEmail, database);
   if (getUserByEmailResult === false) {
     return "Can't find user with that email!";
   }
@@ -106,7 +106,7 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
     user: users[req.session.user_id],
-    urls: urlsForUser(req.session.user_id)
+    urls: urlsForUser(req.session.user_id, urlDatabase)
   };
   res.render('urls_index', templateVars);
 });
@@ -161,7 +161,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
       user: users[req.session.user_id],
       id: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
-      userOwnsURLResult: userOwnsShortURL(req.session.user_id, req.params.id)
+      userOwnsURLResult: userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)
     };
     res.render('urls_show', templateVars);
   }
@@ -170,7 +170,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
 app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index but only if you are logged in and own the URL
   if (!req.session.user_id) {
     res.send('You must be logged in to shorten URLs!');
-  } else if (!userOwnsShortURL(req.session.user_id, req.params.id)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
     res.send('You can not delete URLs that you do not own');
   } else {
     delete urlDatabase[req.params.id];
@@ -181,7 +181,7 @@ app.post('/urls/:id/delete', (req, res) => { // handles post request to delete i
 app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
   if (!req.session.user_id) {
     res.send('You must be logged in to shorten URLs!');
-  } else if (!userOwnsShortURL(req.session.user_id, req.params.id)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
     res.send('You can not delete URLs that you do not own');
   } else {
     urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -202,12 +202,12 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
 });
 
 app.post('/login', (req, res) => { // stores cookie with user login id after validation check
-  const loginValidationResult = loginValidation(req.body.email, req.body.password);
+  const loginValidationResult = loginValidation(req.body.email, req.body.password, users);
   if (loginValidationResult !== true) {
     res.statusCode = 403;
     res.send(loginValidationResult);
   } else {
-    const userID = getUserByEmail(req.body.email);
+    const userID = getUserByEmail(req.body.email, users);
     req.session.user_id = userID;
     res.redirect('/urls');
   }
