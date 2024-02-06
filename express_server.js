@@ -30,6 +30,18 @@ const getUserByEmail = function(emailToFind) {
   return false;
 };
 
+const urlsForUser = function(id) {
+  const urls = [];
+  for (const shortURL in urlDatabase) {
+    const userWhoCreatedURL = urlDatabase[shortURL].userID;
+    const longURLForShortURL = urlDatabase[shortURL].longURL;
+    if (userWhoCreatedURL === id) {
+      urls.push(longURLForShortURL);
+    }
+  }
+  return urls;
+};
+
 const isValidRegistration = function(email, password) { // checks for empty password or email fields and if a user already has the email
   if (email === '' || password === '') {
     return "Both of the email and password forms must not be empty!";
