@@ -1,13 +1,14 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs'); // password hashing
 
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
+
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({ name: 'user_id', keys: ['key1']}));
 
 const urlDatabase = { // default database when server is started TODO: move database into its own file and use fs to update it
   b6UTxQ: {
@@ -104,40 +105,40 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
-    user: users[req.cookies['user_id']],
-    urls: urlsForUser(req.cookies['user_id'])
+    user: users[req.session.user_id],
+    urls: urlsForUser(req.session.user_id)
   };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => { // renders page to create new id. if not logged in, redirects to login page
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     res.redirect('/login');
   } else {
     const templateVars = {
-      user: users[req.cookies['user_id']],
+      user: users[req.session.user_id],
     };
     res.render('urls_new', templateVars);
   }
 });
 
 app.get('/register', (req, res) => { // renders page to register for an account. if logged in already, redirects to /urls
-  if (req.cookies['user_id']) {
+  if (req.session.user_id) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user: users[req.cookies['user_id']],
+      user: users[req.session.user_id],
     };
     res.render('register', templateVars);
   }
 });
 
 app.get('/login', (req, res) => { // renders login page. if logged in already, redirects to /urls
-  if (req.cookies['user_id']) {
+  if (req.session.user_id) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user: users[req.cookies['user_id']],
+      user: users[req.session.user_id],
     };
     res.render('login', templateVars);
   }
@@ -157,19 +158,19 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
     res.send("404: The requested page doesn't exist");
   } else {
     const templateVars = {
-      user: users[req.cookies['user_id']],
+      user: users[req.session.user_id],
       id: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
-      userOwnsURLResult: userOwnsShortURL(req.cookies['user_id'], req.params.id)
+      userOwnsURLResult: userOwnsShortURL(req.session.user_id, req.params.id)
     };
     res.render('urls_show', templateVars);
   }
 });
 
 app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index but only if you are logged in and own the URL
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     res.send('You must be logged in to shorten URLs!');
-  } else if (!userOwnsShortURL(req.cookies['user_id'], req.params.id)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id)){
     res.send('You can not delete URLs that you do not own');
   } else {
     delete urlDatabase[req.params.id];
@@ -178,9 +179,9 @@ app.post('/urls/:id/delete', (req, res) => { // handles post request to delete i
 });
 
 app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     res.send('You must be logged in to shorten URLs!');
-  } else if (!userOwnsShortURL(req.cookies['user_id'], req.params.id)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id)){
     res.send('You can not delete URLs that you do not own');
   } else {
     urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -189,13 +190,13 @@ app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but
 });
 // stretch TODO: check if URL already exists in database
 app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     res.send('You must be logged in to shorten URLs!');
   } else {
     const shortURLid = generateRandomString();
     urlDatabase[shortURLid] = {};
     urlDatabase[shortURLid].longURL = req.body.longURL;
-    urlDatabase[shortURLid].userID = req.cookies['user_id'];
+    urlDatabase[shortURLid].userID = req.session.user_id;
     res.redirect(`/urls/${shortURLid}`);
   }
 });
@@ -207,7 +208,7 @@ app.post('/login', (req, res) => { // stores cookie with user login id after val
     res.send(loginValidationResult);
   } else {
     const userID = getUserByEmail(req.body.email);
-    res.cookie('user_id', userID);
+    req.session.user_id = userID;
     res.redirect('/urls');
   }
 });
@@ -228,7 +229,7 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
     users[newUserID].id = newUserID;
     users[newUserID].email = req.body.email;
     users[newUserID].password = bcrypt.hashSync(req.body.password, 10);
-    res.cookie('user_id', newUserID);
+    req.session.user_id = newUserID;
     res.redirect('/urls');
   }
 });
