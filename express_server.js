@@ -42,6 +42,13 @@ const urlsForUser = function(id) {
   return urls;
 };
 
+const userOwnsShortURL = function(userID, URL) {
+  if (Object.values(urlDatabase[URL]).includes(userID)) {
+    return true;
+  }
+  return false;
+};
+
 const isValidRegistration = function(email, password) { // checks for empty password or email fields and if a user already has the email
   if (email === '' || password === '') {
     return "Both of the email and password forms must not be empty!";
@@ -143,13 +150,18 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
   }
 });
 
-app.get('/urls/:id', (req, res) => { // handles get request to render page with generated id
-  const templateVars = {
-    user: users[req.cookies['user_id']],
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL
-  };
-  res.render('urls_show', templateVars);
+app.get('/urls/:id', (req, res) => { // handles get request to render page with generated id, if it exists. only renders the urls owned by the user
+  if (!urlDatabase[req.params.id]) {
+    res.send("404: The requested page doesn't exist");
+  } else {
+    const templateVars = {
+      user: users[req.cookies['user_id']],
+      id: req.params.id,
+      longURL: urlDatabase[req.params.id].longURL,
+      userOwnsURLResult: userOwnsShortURL(req.cookies['user_id'], req.params.id)
+    };
+    res.render('urls_show', templateVars);
+  }
 });
 // stretch TODO: check if URL already exists in database
 app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
