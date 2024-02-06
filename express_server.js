@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs'); // password hashing
+const getUserByEmail = require('./helpers');
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -22,16 +23,6 @@ const urlDatabase = { // default database when server is started TODO: move data
 };
 
 const users = {}; // default database to store user IDs, passwords and emails
-
-const getUserByEmail = function(emailToFind, database) { // find user in the database that matches the given email
-  for (const user in database) {
-    const userEmail = database[user].email;
-    if (userEmail === emailToFind) {
-      return user;
-    }
-  }
-  return false;
-};
 
 const urlsForUser = function(id, database) { // return the URLs in the database that a user has created
   const urls = {};
