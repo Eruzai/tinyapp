@@ -31,12 +31,12 @@ const getUserByEmail = function(emailToFind) {
 };
 
 const urlsForUser = function(id) {
-  const urls = [];
+  const urls = {};
   for (const shortURL in urlDatabase) {
     const userWhoCreatedURL = urlDatabase[shortURL].userID;
     const longURLForShortURL = urlDatabase[shortURL].longURL;
     if (userWhoCreatedURL === id) {
-      urls.push(longURLForShortURL);
+      urls[shortURL] = longURLForShortURL;
     }
   }
   return urls;
@@ -96,7 +96,7 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
     user: users[req.cookies['user_id']],
-    urls: urlDatabase
+    urls: urlsForUser(req.cookies['user_id'])
   };
   res.render('urls_index', templateVars);
 });
