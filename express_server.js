@@ -228,7 +228,6 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
     users[newUserID].id = newUserID;
     users[newUserID].email = req.body.email;
     users[newUserID].password = bcrypt.hashSync(req.body.password, 10);
-    console.log(users);
     res.cookie('user_id', newUserID);
     res.redirect('/urls');
   }
