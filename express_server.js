@@ -42,8 +42,8 @@ const urlsForUser = function(id) {
   return urls;
 };
 
-const userOwnsShortURL = function(userID, URL) {
-  if (Object.values(urlDatabase[URL]).includes(userID)) {
+const userOwnsShortURL = function(ID, URL) {
+  if (urlDatabase[URL].userID === ID) {
     return true;
   }
   return false;
@@ -172,18 +172,23 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     urlDatabase[shortURLid] = {};
     urlDatabase[shortURLid].longURL = req.body.longURL;
     urlDatabase[shortURLid].userID = req.cookies['user_id'];
+    console.log(urlDatabase);
     res.redirect(`/urls/${shortURLid}`);
   }
 });
 
 app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index
-  delete urlDatabase[req.params.id];
-  res.redirect('/urls');
+  if (userOwnsShortURL(req.cookies['user_id'], req.params.id)) {
+    delete urlDatabase[req.params.id];
+    res.redirect('/urls');
+  }
 });
 
 app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path)
-  urlDatabase[req.params.id].longURL = req.body.longURL;
-  res.redirect('/urls');
+  if (userOwnsShortURL(req.cookies['user_id'], req.params.id)) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect('/urls');
+  }
 });
 
 app.post('/login', (req, res) => { // stores cookie with user login id after validation check
@@ -215,7 +220,6 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
     users[newUserID].email = req.body.email;
     users[newUserID].password = req.body.password;
     res.cookie('user_id', newUserID);
-    console.log('new data added: ', users);
     res.redirect('/urls');
   }
 });
