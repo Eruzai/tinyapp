@@ -194,7 +194,6 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     urlDatabase[shortURLid] = {};
     urlDatabase[shortURLid].longURL = req.body.longURL;
     urlDatabase[shortURLid].userID = req.cookies['user_id'];
-    console.log(urlDatabase);
     res.redirect(`/urls/${shortURLid}`);
   }
 });
