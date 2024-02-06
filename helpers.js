@@ -5,7 +5,7 @@ const getUserByEmail = function(emailToFind, database) { // find user in the dat
       return user;
     }
   }
-  return false;
+  return undefined;
 };
 
-module.exports = getUserByEmail;
+module.exports = { getUserByEmail };
