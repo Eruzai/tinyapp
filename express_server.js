@@ -163,6 +163,28 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
     res.render('urls_show', templateVars);
   }
 });
+
+app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index but only if you are logged in and own the URL
+  if (!req.cookies['user_id']) {
+    res.send('You must be logged in to shorten URLs!');
+  } else if (!userOwnsShortURL(req.cookies['user_id'], req.params.id)){
+    res.send('You can not delete URLs that you do not own');
+  } else {
+    delete urlDatabase[req.params.id];
+    res.redirect('/urls');
+  }
+});
+
+app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
+  if (!req.cookies['user_id']) {
+    res.send('You must be logged in to shorten URLs!');
+  } else if (!userOwnsShortURL(req.cookies['user_id'], req.params.id)){
+    res.send('You can not delete URLs that you do not own');
+  } else {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect('/urls');
+  }
+});
 // stretch TODO: check if URL already exists in database
 app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
   if (!req.cookies['user_id']) {
@@ -174,20 +196,6 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     urlDatabase[shortURLid].userID = req.cookies['user_id'];
     console.log(urlDatabase);
     res.redirect(`/urls/${shortURLid}`);
-  }
-});
-
-app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index
-  if (userOwnsShortURL(req.cookies['user_id'], req.params.id)) {
-    delete urlDatabase[req.params.id];
-    res.redirect('/urls');
-  }
-});
-
-app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path)
-  if (userOwnsShortURL(req.cookies['user_id'], req.params.id)) {
-    urlDatabase[req.params.id].longURL = req.body.longURL;
-    res.redirect('/urls');
   }
 });
 
