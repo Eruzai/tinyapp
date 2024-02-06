@@ -17,7 +17,7 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ name: 'user_id', keys: ['key1', 'key2']}));
 
-const urlDatabase = { // default database when server is started TODO: move database into its own file and use fs to update it
+const urlDatabase = { // default database when server is started
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
@@ -28,7 +28,7 @@ const urlDatabase = { // default database when server is started TODO: move data
   },
 };
 
-const users = {}; // default database to store user IDs, passwords and emails
+const users = {}; // default database to store user IDs, passwords and email addresses
 
 app.get('/', (req, res) => {
   res.send('Hello!');
