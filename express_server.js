@@ -147,6 +147,7 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     const shortURLid = generateRandomString();
     urlDatabase[shortURLid] = {};
     urlDatabase[shortURLid].longURL = req.body.longURL;
+    urlDatabase[shortURLid].userID = req.cookies['user_id'];
     res.redirect(`/urls/${shortURLid}`);
   }
 });
