@@ -8,7 +8,7 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession({ name: 'user_id', keys: ['key1']}));
+app.use(cookieSession({ name: 'user_id', keys: ['key1', 'key2']}));
 
 const urlDatabase = { // default database when server is started TODO: move database into its own file and use fs to update it
   b6UTxQ: {
@@ -214,7 +214,7 @@ app.post('/login', (req, res) => { // stores cookie with user login id after val
 });
 
 app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
-  res.clearCookie('user_id');
+  req.session['user_id'] = null;
   res.redirect('/login');
 });
 
