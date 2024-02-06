@@ -22,7 +22,7 @@ const urlDatabase = { // default database when server is started TODO: move data
 
 const users = {}; // default database to store user IDs, passwords and emails
 
-const getUserByEmail = function(emailToFind) {
+const getUserByEmail = function(emailToFind) { // find user in the database that matches the given email
   for (const user in users) {
     const userEmail = users[user].email;
     if (userEmail === emailToFind) {
@@ -32,7 +32,7 @@ const getUserByEmail = function(emailToFind) {
   return false;
 };
 
-const urlsForUser = function(id) {
+const urlsForUser = function(id) { // return the URLs in the database that a user has created
   const urls = {};
   for (const shortURL in urlDatabase) {
     const userWhoCreatedURL = urlDatabase[shortURL].userID;
@@ -44,7 +44,7 @@ const urlsForUser = function(id) {
   return urls;
 };
 
-const userOwnsShortURL = function(ID, URL) {
+const userOwnsShortURL = function(ID, URL) { // return true or false dependant on if the user owns the URL
   if (urlDatabase[URL].userID === ID) {
     return true;
   }
@@ -61,7 +61,7 @@ const isValidRegistration = function(email, password) { // checks for empty pass
   return true;
 };
 
-const loginValidation = function(loginEmail, loginPassword) {
+const loginValidation = function(loginEmail, loginPassword) { // checks if email exists, then checks stored password of that email to login password
   const getUserByEmailResult = getUserByEmail(loginEmail);
   if (getUserByEmailResult === false) {
     return "Can't find user with that email!";
