@@ -15,6 +15,7 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieSession({ name: 'user_id', keys: ['key1', 'key2']}));
 
 const urlDatabase = { // default database when server is started
