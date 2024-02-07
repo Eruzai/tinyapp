@@ -86,7 +86,8 @@ app.get('/login', (req, res) => { // renders login page. if logged in already, r
 
 app.get('/u/:id', (req, res) => { // redirects to longURL when requested for short id, if it exists. otherwise shows 404 message
   if (!urlDatabase[req.params.id]) {
-    res.send("404: The requested page doesn't exist");
+    res.statusCode = 404;
+    res.send("There is no page attached to that URL ID");
   } else {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
@@ -95,7 +96,8 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
 
 app.get('/urls/:id', (req, res) => { // handles get request to render page with generated id, if it exists. only renders the urls owned by the user
   if (!urlDatabase[req.params.id]) {
-    res.send("404: The requested page doesn't exist");
+    res.statusCode = 404;
+    res.send("There is no page attached to that URL ID");
   } else {
     const templateVars = {
       user: users[req.session.user_id],
@@ -103,14 +105,19 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
       longURL: urlDatabase[req.params.id].longURL,
       userOwnsURLResult: userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)
     };
+    if (templateVars.userOwnsURLResult === false) {
+      res.statusCode = 403;
+    };
     res.render('urls_show', templateVars);
   }
 });
 
 app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index but only if you are logged in and own the URL
   if (!req.session.user_id) {
-    res.send('You must be logged in to shorten URLs!');
+    res.statusCode = 403;
+    res.send('You must be logged in to delete URLs!');
   } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
+    res.statusCode = 403;
     res.send('You can not delete URLs that you do not own');
   } else {
     delete urlDatabase[req.params.id];
@@ -120,9 +127,11 @@ app.post('/urls/:id/delete', (req, res) => { // handles post request to delete i
 
 app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
   if (!req.session.user_id) {
-    res.send('You must be logged in to shorten URLs!');
+    res.statusCode = 403;
+    res.send('You must be logged in to edit URLs!');
   } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
-    res.send('You can not delete URLs that you do not own');
+    res.statusCode = 403;
+    res.send('You can not edit URLs that you do not own');
   } else {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect('/urls');
@@ -131,6 +140,7 @@ app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but
 // stretch TODO: check if URL already exists in database
 app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
   if (!req.session.user_id) {
+    res.statusCode = 403;
     res.send('You must be logged in to shorten URLs!');
   } else {
     const shortURLid = generateRandomString();
