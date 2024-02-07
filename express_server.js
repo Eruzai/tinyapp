@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const bcrypt = require('bcryptjs'); // password hashing
 const {
   getUserByEmail,
@@ -16,6 +17,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(methodOverride('_method')); // used to override some POST methods with DELETE or PUT
 app.use(cookieSession({ name: 'user_id', keys: ['key1', 'key2']}));
 
 const urlDatabase = { // default database when server is started
@@ -112,7 +114,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
   }
 });
 
-app.post('/urls/:id/delete', (req, res) => { // handles post request to delete id from database then reroutes to index but only if you are logged in and own the URL
+app.delete('/urls/:id', (req, res) => { // handles delete request (overridden from post) to delete id from database then reroutes to index but only if you are logged in and own the URL
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('You must be logged in to delete URLs!');
@@ -125,7 +127,7 @@ app.post('/urls/:id/delete', (req, res) => { // handles post request to delete i
   }
 });
 
-app.post('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
+app.put('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but only if logged in and you own the URL
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('You must be logged in to edit URLs!');
