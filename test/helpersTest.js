@@ -28,6 +28,7 @@ describe('getUserByEmail', function() {
   });
 });
 
+// HTTP server tests
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const expect = chai.expect;
@@ -52,3 +53,45 @@ describe("Login and Access Control Test", () => {
   });
 });
 
+describe('GET Path Tests While Not Logged In', () => {
+  const agent = chai.request.agent('http://localhost:8080');
+
+  it('should redirect GET / to /login with status code 302', () => {
+    return agent
+      .get('/')
+      .then((res) => {
+        expect(res).to.redirect;
+        expect(res.redirects[0]).to.equal('http://localhost:8080/login');
+      });
+  });
+
+  it('should redirect GET /urls/new to /login with status code 302', () => {
+    return agent
+      .get('/urls/new')
+      .then((res) => {
+        expect(res).to.redirect;
+        expect(res.redirects[0]).to.equal('http://localhost:8080/login');
+      });
+  });
+
+  it('should return status code 404 for GET /urls/NOTEXISTS', () => {
+    return agent
+      .get('/urls/NOTEXISTS')
+      .then((res) => {
+        expect(res).to.have.status(404);
+      });
+  });
+
+  it('should return status code 403 for GET /urls/b6UTxQ', () => {
+    return agent
+      .get('/urls/b6UTxQ')
+      .then((res) => {
+        expect(res).to.have.status(403);
+      });
+  });
+
+  // Cleanup agent after all tests
+  after(() => {
+    agent.close();
+  });
+});
