@@ -32,16 +32,16 @@ const urlDatabase = { // default database when server is started
 const users = {}; // default database to store user IDs, passwords and email addresses
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  if (!req.session.user_id) {
+    res.redirect('/login');
+  } else {
+    res.redirect('/urls');
+  }
 });
 
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
+// app.get('/urls.json', (req, res) => {
+//   res.json(urlDatabase);
+// });
 
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
