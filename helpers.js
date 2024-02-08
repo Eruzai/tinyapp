@@ -68,25 +68,11 @@ const generateRandomString = function() { // used to generate short URL id
   return string;
 };
 
-const shortURLHasBeenVisitedBeforeByThisUser = function (userID, shortURL, database) {
-  if ((database[shortURL].uniqueVisitors).length === 0) {
-    return false;
-  };
-  
-  const keys = Object.keys(database[shortURL].uniqueVisitors);
-  if (keys.includes(userID)) {
-    return true;
-  }
-  
-  return false;
-};
-
 module.exports = {
   getUserByEmail,
   urlsForUser,
   userOwnsShortURL,
   isValidRegistration,
   loginValidation,
-  generateRandomString,
-  shortURLHasBeenVisitedBeforeByThisUser
+  generateRandomString
 };
