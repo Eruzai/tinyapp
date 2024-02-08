@@ -4,8 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+![This is the login screen](/screenshots/Login.png)
+![This page allows you to create an account.](/screenshots/Register.png)
+![This is the page to create shortened URLs.](/screenshots/CreateTinyURL.png)
+![This page lists all created URLs by the logged in user and gives access to details and delete buttons](/screenshots/URLIndex.png)
+![This page allows editing the long URL referenced by a short URL link and also shows analytical visitor information](/screenshots/Details.png)
 
 ## Dependencies
 
@@ -27,7 +30,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 - Simple account registration (just supply email and create a password).
 - Header displays login email when logged in, otherwise displays login and register buttons.
-- Home page displays all shortened URLS created by user; giving access to edit, delete, or to create new links.
+- Home page displays all shortened URLs created by user; giving access to edit, delete, or to create new links.
 - Edit page allows for easy editing of the long URL associated with its shortened link as well as showing analytical visitor information.
-- Password information and cookies are encrypted!
+- Password information is hashed and cookies are encrypted!
 - Your created URLs' index, deletion function, and edit and analytical data pages are protected and can only be accessed by you!
