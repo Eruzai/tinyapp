@@ -8,8 +8,7 @@ const {
   userOwnsShortURL,
   isValidRegistration,
   loginValidation,
-  generateRandomString,
-  shortURLHasBeenVisitedBeforeByThisUser } = require('./helpers');
+  generateRandomString } = require('./helpers');
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -27,13 +26,15 @@ const urlDatabase = { // default database when server is started
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
     visitors: 0,
-    uniqueVisitors: {}
+    uniqueVisitors: [],
+    visitorTimeStamps: []
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
     visitors: 0,
-    uniqueVisitors: {}
+    uniqueVisitors: [],
+    visitorTimeStamps: []
   },
 };
 
@@ -98,9 +99,12 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
     res.send("There is no page attached to that URL ID");
   } else {
     urlDatabase[req.params.id].visitors++;
-    if (!shortURLHasBeenVisitedBeforeByThisUser(req.session.user_id, req.params.id, urlDatabase)) {
-      urlDatabase[req.params.id].uniqueVisitors[req.session.user_id] = Date;
+
+    if (!urlDatabase[req.params.id].uniqueVisitors.includes(req.session.user_id)) {
+      urlDatabase[req.params.id].uniqueVisitors.push(req.session.user_id);
     }
+    urlDatabase[req.params.id].visitorTimeStamps.push(`${req.session.user_id} accessed this link on ${new Date()}`);
+
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
@@ -117,6 +121,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
       longURL: urlDatabase[req.params.id].longURL,
       visitors: urlDatabase[req.params.id].visitors,
       uniqueVisitors: Object.keys((urlDatabase[req.params.id].uniqueVisitors)).length,
+      timeStamps: urlDatabase[req.params.id].visitorTimeStamps,
       userOwnsURLResult: userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)
     };
     if (templateVars.userOwnsURLResult === false) {
@@ -162,7 +167,8 @@ app.post('/urls', (req, res) => { // creates short id for given URL and redirect
     urlDatabase[shortURLid].longURL = req.body.longURL;
     urlDatabase[shortURLid].userID = req.session.user_id;
     urlDatabase[shortURLid].visitors = 0;
-    urlDatabase[shortURLid].uniqueVisitors = {};
+    urlDatabase[shortURLid].uniqueVisitors = [];
+    urlDatabase[shortURLid].visitorTimeStamps = [];
     res.redirect(`/urls/${shortURLid}`);
   }
 });
