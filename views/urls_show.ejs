@@ -56,28 +56,20 @@
               </h5>
             </div>
           </div>
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-text">
-                Visitors: <%= visitors %> Unique Visitors: <%= uniqueVisitors %>
-              </h5>
+          <div class="container mt-3">
+            <div class="row">
+              <div class="col">
+                <h4>There have been <%= visitors %> visits to this link, of which <%= uniqueVisitors %> were unique visitors!</h4>
+                <h5>Visitor Access Data:</h5>
+                <ul class="list-group">
+                  <% for (const time of timeStamps) { %>
+                    <li class="list-group-item"><%= time %></li>
+                  <% } %>
+                </ul>
+              </div>
             </div>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Visitor Access Data:</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for (const time of timeStamps) { %>
-                <tr>
-                  <td><%= time %></td>
-                </tr>
-              <% } %>
-            </tbody>
-          </table>
-      <% } %>
+          </div>  
+    <% } %>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
