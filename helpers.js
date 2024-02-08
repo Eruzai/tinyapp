@@ -64,7 +64,7 @@ const generateRandomString = function() { // used to generate short URL id
       const num = randomNum + 61; // utf16 lower case letters start at 97 (61 + 36)
       string += String.fromCodePoint(num);
     }
-  };
+  }
   return string;
 };
 

@@ -40,17 +40,13 @@ const urlDatabase = { // default database when server is started
 
 const users = {}; // default database to store user IDs, passwords and email addresses
 
-app.get('/', (req, res) => {
+app.get('/', (req, res) => { // redirects to login or urls page dependant on login
   if (!req.session.user_id) {
     res.redirect('/login');
   } else {
     res.redirect('/urls');
   }
 });
-
-// app.get('/urls.json', (req, res) => {
-//   res.json(urlDatabase);
-// });
 
 app.get('/urls', (req, res) => { // renders index page when requested
   const templateVars = {
@@ -98,12 +94,12 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
     res.statusCode = 404;
     res.send("There is no page attached to that URL ID");
   } else {
-    urlDatabase[req.params.id].visitors++;
+    urlDatabase[req.params.id].visitors++; // increments visitor count each time this short url is accessed
 
-    if (!urlDatabase[req.params.id].uniqueVisitors.includes(req.session.user_id)) {
+    if (!urlDatabase[req.params.id].uniqueVisitors.includes(req.session.user_id)) { // if this is the first access of the url for this user, their id is stored for this url as part of the unique visitors count
       urlDatabase[req.params.id].uniqueVisitors.push(req.session.user_id);
     }
-    urlDatabase[req.params.id].visitorTimeStamps.push(`${req.session.user_id} accessed this link on ${new Date()}`);
+    urlDatabase[req.params.id].visitorTimeStamps.push(`${req.session.user_id} accessed this link on ${new Date()}`); // stores each access of this url with time and user id in the url database
 
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
@@ -126,7 +122,7 @@ app.get('/urls/:id', (req, res) => { // handles get request to render page with 
     };
     if (templateVars.userOwnsURLResult === false) {
       res.statusCode = 403;
-    };
+    }
     res.render('urls_show', templateVars);
   }
 });
@@ -135,7 +131,7 @@ app.delete('/urls/:id', (req, res) => { // handles delete request (overridden fr
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('You must be logged in to delete URLs!');
-  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)) {
     res.statusCode = 403;
     res.send('You can not delete URLs that you do not own');
   } else {
@@ -148,7 +144,7 @@ app.put('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but 
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('You must be logged in to edit URLs!');
-  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)){
+  } else if (!userOwnsShortURL(req.session.user_id, req.params.id, urlDatabase)) {
     res.statusCode = 403;
     res.send('You can not edit URLs that you do not own');
   } else {
@@ -156,12 +152,12 @@ app.put('/urls/:id', (req, res) => { // changes URL of given ID (edit path) but 
     res.redirect('/urls');
   }
 });
-// stretch TODO: check if URL already exists in database
+
 app.post('/urls', (req, res) => { // creates short id for given URL and redirects to new page to show result. if not logged in, sends message to user.
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('You must be logged in to shorten URLs!');
-  } else {
+  } else { // stores necessary information and default visitor status for the new url
     const shortURLid = generateRandomString();
     urlDatabase[shortURLid] = {};
     urlDatabase[shortURLid].longURL = req.body.longURL;
@@ -195,7 +191,7 @@ app.post('/register', (req, res) => { // adds new user ID with password and emai
   if (registrationValidationResult !== true) { // sends appropriate message to user if registration info invalid
     res.statusCode = 400;
     res.send(registrationValidationResult);
-  } else { // creates new user if registration info is valid
+  } else { // creates new user with all information if registration info is valid
     const newUserID = generateRandomString();
     users[newUserID] = {};
     users[newUserID].id = newUserID;
