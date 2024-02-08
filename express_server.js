@@ -99,7 +99,7 @@ app.get('/u/:id', (req, res) => { // redirects to longURL when requested for sho
     if (!urlDatabase[req.params.id].uniqueVisitors.includes(req.session.user_id)) { // if this is the first access of the url for this user, their id is stored for this url as part of the unique visitors count
       urlDatabase[req.params.id].uniqueVisitors.push(req.session.user_id);
     }
-    urlDatabase[req.params.id].visitorTimeStamps.push(`${req.session.user_id} accessed this link on ${new Date()}`); // stores each access of this url with time and user id in the url database
+    urlDatabase[req.params.id].visitorTimeStamps.unshift(`${req.session.user_id} accessed this link on ${new Date()}`); // stores each access of this url with time and user id in the url database
 
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
