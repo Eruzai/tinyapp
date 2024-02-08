@@ -64,8 +64,21 @@ const generateRandomString = function() { // used to generate short URL id
       const num = randomNum + 61; // utf16 lower case letters start at 97 (61 + 36)
       string += String.fromCodePoint(num);
     }
-  }
+  };
   return string;
+};
+
+const shortURLHasBeenVisitedBeforeByThisUser = function (userID, shortURL, database) {
+  if ((database[shortURL].uniqueVisitors).length === 0) {
+    return false;
+  };
+  
+  const keys = Object.keys(database[shortURL].uniqueVisitors);
+  if (keys.includes(userID)) {
+    return true;
+  }
+  
+  return false;
 };
 
 module.exports = {
@@ -74,5 +87,6 @@ module.exports = {
   userOwnsShortURL,
   isValidRegistration,
   loginValidation,
-  generateRandomString
+  generateRandomString,
+  shortURLHasBeenVisitedBeforeByThisUser
 };
