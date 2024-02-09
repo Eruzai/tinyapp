@@ -182,7 +182,7 @@ app.post('/login', (req, res) => { // stores cookie with user login id after val
 });
 
 app.post('/logout', (req, res) => { // clears cookie storing user_id when logout
-  req.session['user_id'] = null;
+  req.session = null;
   res.redirect('/login');
 });
 
